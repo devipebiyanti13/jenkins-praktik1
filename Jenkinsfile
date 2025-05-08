@@ -5,19 +5,18 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Create and activate virtual environment
+                    // Membuat dan mengaktifkan virtual environment
                     sh 'python3 -m venv venv'
-                    sh 'source venv/bin/activate'
-                    // Install dependencies
-                    sh 'pip install -r requirements.txt'
+                    // Menggunakan titik (.) untuk mengaktifkan virtual environment
+                    sh '. venv/bin/activate && pip install -r requirements.txt'
                 }
             }
         }
         stage('Run Tests') {
             steps {
                 script {
-                    // Ensure virtual environment is activated before running tests
-                    sh 'source venv/bin/activate && pytest test_app.py'
+                    // Memastikan virtual environment diaktifkan sebelum menjalankan tes
+                    sh '. venv/bin/activate && pytest test_app.py'
                 }
             }
         }
