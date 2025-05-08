@@ -14,9 +14,9 @@ pipeline {
         }
         stage('Deploy') {
             when {
-                any0f {
+                anyOf {
                     branch 'main'
-                    branch pattern: "relase/.*", comparator: "REGEXP"
+                    branch pattern: "release/.*", comparator: "REGEXP"
                 }
             }
             steps {
