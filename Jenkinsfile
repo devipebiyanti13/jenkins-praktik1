@@ -4,12 +4,21 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                script {
+                    // Create and activate virtual environment
+                    sh 'python3 -m venv venv'
+                    sh 'source venv/bin/activate'
+                    // Install dependencies
+                    sh 'pip install -r requirements.txt'
+                }
             }
         }
         stage('Run Tests') {
             steps {
-                sh 'pytest test_app.py'
+                script {
+                    // Ensure virtual environment is activated before running tests
+                    sh 'source venv/bin/activate && pytest test_app.py'
+                }
             }
         }
         stage('Deploy') {
@@ -42,7 +51,7 @@ pipeline {
         failure {
             script {
                 def payload = [
-                    content: "❌ 🙅🏻‍♀️ BUild FAILED on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
+                    content: "❌ 🙅🏻‍♀️ Build FAILED on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
                 ]
                 httpRequest(
                     httpMode: 'POST',
