@@ -4,19 +4,27 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                script {
+                    // Membuat dan mengaktifkan virtual environment
+                    sh 'python3 -m venv venv'
+                    // Menggunakan titik (.) untuk mengaktifkan virtual environment
+                    sh '. venv/bin/activate && pip install -r requirements.txt'
+                }
             }
         }
         stage('Run Tests') {
             steps {
-                sh 'pytest test_app.py'
+                script {
+                    // Memastikan virtual environment diaktifkan sebelum menjalankan tes
+                    sh '. venv/bin/activate && pytest test_app.py'
+                }
             }
         }
         stage('Deploy') {
             when {
-                any0f {
+                anyOf {
                     branch 'main'
-                    branch pattern: "relase/.*", comparator: "REGEXP"
+                    branch pattern: "release/.*", comparator: "REGEXP"
                 }
             }
             steps {
@@ -42,7 +50,7 @@ pipeline {
         failure {
             script {
                 def payload = [
-                    content: "❌ 🙅🏻‍♀️ BUild FAILED on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
+                    content: "❌ 🙅🏻‍♀️ Build FAILED on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
                 ]
                 httpRequest(
                     httpMode: 'POST',
